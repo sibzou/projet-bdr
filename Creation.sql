@@ -34,6 +34,15 @@ IS
 BEGIN
 END;
 
+CREATE TRIGGER portefeuille_pmvl BEFORE INSERT OR UPDATE OF CodeValeur, PAM, Quantite ON Portefeuille FOR EACH ROW
+DECLARE
+    valeur_cours DECIMAL(4, 2);
+BEGIN
+    SELECT Cours into valeur_cours FROM Valeur WHERE CodeValeur = :new.CodeValeur;
+    :NEW.PMVL := (valeur_cours - :new.PAM) * :new.Quantite;
+END;
+/
+
 -- Création de la procédure MAJValeur
 CREATE OR REPLACE PROCEDURE MAJValeur(Code IN VARCHAR2, Cours IN NUMBER) 
 IS
