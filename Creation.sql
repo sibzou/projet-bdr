@@ -36,8 +36,6 @@ END;
 
 -- Met à jour le PMVL quand le cours d'une valeur change
 CREATE TRIGGER valeur_pmvl BEFORE UPDATE OF Cours ON Valeur FOR EACH ROW
-DECLARE
-
 BEGIN
     UPDATE Portefeuille SET PMVL = (:NEW.Cours - PAM) * Quantite WHERE CodeValeur = :NEW.CodeValeur;
 END;
@@ -54,9 +52,24 @@ END;
 /
 
 -- Création de la procédure MAJValeur
-CREATE OR REPLACE PROCEDURE MAJValeur(Code IN VARCHAR2, Cours IN NUMBER) 
-IS
+CREATE PROCEDURE MAJValeur(CodeValeurIn IN VARCHAR2, CoursIn IN NUMBER) IS
+    code_count NUMBER;
+    cours_incorrect EXCEPTION;
+    code_inconnu EXCEPTION;
 BEGIN
+    IF CoursIn < 0
+    THEN
+        RAISE cours_incorrect;
+    END IF;
+
+    SELECT COUNT(*) INTO code_count FROM Valeur WHERE CodeValeur = CodeValeurIn;
+
+    IF code_count = 0
+    THEN
+        RAISE code_inconnu;
+    END IF;
+
+    UPDATE Valeur SET Cours = CoursIn WHERE CodeValeur = CodeValeurIn;
 END;
 
 -- Création de la procédure Acheter
@@ -89,3 +102,12 @@ RETURNS NUMBER
         RETURN scalar_expression
     END
 [ ; ]
+
+DROP PROCEDURE MAJValeur;
+DROP TRIGGER valeur_pmvl;
+DROP TRIGGER portefeuille_pmvl;
+DROP TABLE Portefeuille;
+DROP TABLE Operation;
+DROP TABLE Valeur;
+DROP TABLE Secteur;
+DROP TABLE Compte;
