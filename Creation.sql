@@ -1,47 +1,33 @@
--- Suppression des objets
--- Suppression des tables et des contraintes associées…
-DROP TABLE Compte CASCADE CONSTRAINTS;
-DROP TABLE Operation CASCADE CONSTRAINTS;
-DROP TABLE Portefeuille CASCADE CONSTRAINTS;
-DROP TABLE Secteur CASCADE CONSTRAINTS;
-DROP TABLE Valeur CASCADE CONSTRAINTS;
+CREATE TABLE Compte (NumCompte NUMBER(3) PRIMARY KEY,
+                     NomClient VARCHAR2(15) NOT NULL,
+                     DateOuverture DATE NOT NULL,
+                     Solde DECIMAL(7, 2) NOT NULL,
+                     PMVR DECIMAL(7, 2) DEFAULT 0 NOT NULL);
 
--- a) Création des tables...
-CREATE TABLE Compte (   numCompte NUMBER(3) PRIMARY KEY, 
-            nomClient VARCHAR2(15) NOT NULL,
-            DateOuverture DATE NOT NULL,
-            Solde DECIMAL(7,2),
-            PMVR DECIMAL(7,2) DEFAULT 0
-            );
-             
-CREATE TABLE Secteur ( CodeSE CHAR(4) PRIMARY KEY, 
-            SecteurEconomique VARCHAR2(15) NOT NULL
-            );
-             
-CREATE TABLE Valeur ( codeValeur VARCHAR2(8) PRIMARY KEY,
-        Denomination VARCHAR2(10) NOT NULL, 
-        CodeSecteur CHAR(8) NOT NULL,
-        Indice CHAR(8) NOT NULL,
-        Cours DECIMAL(4,2) NOT NULL
-        );
+CREATE TABLE Secteur (CodeSE CHAR(4) PRIMARY KEY,
+                      SecteurEconomique VARCHAR2(15) NOT NULL);
 
-CREATE TABLE Operation ( NumOp NUMBER(2) PRIMARY KEY,
-            numCompte NUMBER(3) REFERENCES Compte(numCompte),
-            CodeValeur CHAR(8) REFERENCES Valeur(codeValeur),
-            DateOp DATE NOT NULL, 
-            Nature CHAR(1) NOT NULL,
-            QteOp NUMBER(3) NOT NULL,
-            Montant DECIMAL(7,2) NOT NULL
-             );
-             
-CREATE TABLE Portefeuille ( NumCompte NUMBER(3) REFERENCES Compte(numCompte),
-            CodeValeur CHAR(8) REFERENCES Valeur(codeValeur),
-            Quantite NUMBER(3),
-            PAM DECIMAL(5,2), 
-            PMVL DECIMAL(5,2),
-            PRIMARY KEY(NumCompte, CodeValeur)
-             );
-             
+CREATE TABLE Valeur (CodeValeur VARCHAR2(8) PRIMARY KEY,
+                     Denomination VARCHAR2(10) NOT NULL,
+                     CodeSE CHAR(4) REFERENCES Secteur(CodeSE),
+                     Indice CHAR(8) NOT NULL,
+                     Cours DECIMAL(4, 2) NOT NULL);
+
+CREATE TABLE Operation (NumOp NUMBER(2) PRIMARY KEY,
+                        NumCompte NUMBER(3) REFERENCES Compte(NumCompte),
+                        CodeValeur VARCHAR2(8) REFERENCES Valeur(CodeValeur),
+                        DateOp DATE NOT NULL,
+                        Nature CHAR(1) NOT NULL,
+                        QteOp NUMBER(3) NOT NULL,
+                        Montant DECIMAL(7, 2) NOT NULL);
+
+CREATE TABLE Portefeuille (NumCompte NUMBER(3) REFERENCES Compte(NumCompte),
+                           CodeValeur VARCHAR2(8) REFERENCES Valeur(CodeValeur),
+                           Quantite NUMBER(3) NOT NULL,
+                           PAM DECIMAL(5, 2) NOT NULL,
+                           PMVL DECIMAL(5, 2) NOT NULL,
+                           PRIMARY KEY(NumCompte, CodeValeur));
+
 -- Création de la procédure AjouterService
 CREATE OR REPLACE PROCEDURE OuvrirCompte(Nom IN VARCHAR2, Montant IN NUMBER) 
 IS
