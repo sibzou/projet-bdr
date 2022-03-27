@@ -34,12 +34,22 @@ IS
 BEGIN
 END;
 
-CREATE TRIGGER portefeuille_pmvl BEFORE INSERT OR UPDATE OF CodeValeur, PAM, Quantite ON Portefeuille FOR EACH ROW
+-- Met à jour le PMVL quand le cours d'une valeur change
+CREATE TRIGGER valeur_pmvl BEFORE UPDATE OF Cours ON Valeur FOR EACH ROW
+DECLARE
+
+BEGIN
+    UPDATE Portefeuille SET PMVL = (:NEW.Cours - PAM) * Quantite WHERE CodeValeur = :NEW.CodeValeur;
+END;
+/
+
+-- Met à jour le PMVL quand le PAM ou la quantité change
+CREATE TRIGGER portefeuille_pmvl BEFORE INSERT OR UPDATE OF PAM, Quantite ON Portefeuille FOR EACH ROW
 DECLARE
     valeur_cours DECIMAL(4, 2);
 BEGIN
-    SELECT Cours into valeur_cours FROM Valeur WHERE CodeValeur = :new.CodeValeur;
-    :NEW.PMVL := (valeur_cours - :new.PAM) * :new.Quantite;
+    SELECT Cours into valeur_cours FROM Valeur WHERE CodeValeur = :NEW.CodeValeur;
+    :NEW.PMVL := (valeur_cours - :NEW.PAM) * :NEW.Quantite;
 END;
 /
 
