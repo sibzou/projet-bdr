@@ -41,16 +41,6 @@ BEGIN
 END;
 /
 
--- Met à jour le PMVL quand le PAM ou la quantité change
-CREATE TRIGGER portefeuille_pmvl BEFORE INSERT OR UPDATE OF PAM, Quantite ON Portefeuille FOR EACH ROW
-DECLARE
-    valeur_cours DECIMAL(4, 2);
-BEGIN
-    SELECT Cours into valeur_cours FROM Valeur WHERE CodeValeur = :NEW.CodeValeur;
-    :NEW.PMVL := (valeur_cours - :NEW.PAM) * :NEW.Quantite;
-END;
-/
-
 -- Création de la procédure MAJValeur
 CREATE PROCEDURE MAJValeur(CodeValeurIn IN VARCHAR2, CoursIn IN NUMBER) IS
     code_count NUMBER;
@@ -105,7 +95,6 @@ RETURNS NUMBER
 
 DROP PROCEDURE MAJValeur;
 DROP TRIGGER valeur_pmvl;
-DROP TRIGGER portefeuille_pmvl;
 DROP TABLE Portefeuille;
 DROP TABLE Operation;
 DROP TABLE Valeur;
