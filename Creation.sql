@@ -29,10 +29,10 @@ CREATE TABLE Portefeuille (NumCompte NUMBER(3) REFERENCES Compte(NumCompte),
                            PRIMARY KEY(NumCompte, CodeValeur));
 
 -- Création de la procédure AjouterService
-CREATE OR REPLACE PROCEDURE OuvrirCompte(Nom IN VARCHAR2, Montant IN NUMBER) 
-IS
-BEGIN
-END;
+-- CREATE OR REPLACE PROCEDURE OuvrirCompte(Nom IN VARCHAR2, Montant IN NUMBER)
+-- IS
+-- BEGIN
+-- END;
 
 -- Met à jour le PMVL quand le cours d'une valeur change
 CREATE TRIGGER valeur_pmvl BEFORE UPDATE OF Cours ON Valeur FOR EACH ROW
@@ -61,13 +61,14 @@ BEGIN
 
     UPDATE Valeur SET Cours = CoursIn WHERE CodeValeur = CodeValeurIn;
 END;
+/
 
 -- Création de la procédure Acheter
-CREATE OR REPLACE PROCEDURE Acheter((NumCpte IN NUMBER, Code IN VARCHAR2, DateA IN DATE, Quant IN NUMBER,
-MA IN NUMBER) 
-IS
-BEGIN
-END;
+-- CREATE OR REPLACE PROCEDURE Acheter((NumCpte IN NUMBER, Code IN VARCHAR2, DateA IN DATE, Quant IN NUMBER,
+-- MA IN NUMBER)
+-- IS
+-- BEGIN
+-- END;
 
 CREATE SEQUENCE numop_seq;
 
@@ -119,21 +120,21 @@ END;
 /
 
 -- Création de la procédure RepartitionPortefeuille
-CREATE OR REPLACE PROCEDURE RepartitionPortefeuille(NumCpte IN NUMBER, Critere IN CHAR) 
-IS
-BEGIN
-END;
+-- CREATE OR REPLACE PROCEDURE RepartitionPortefeuille(NumCpte IN NUMBER, Critere IN CHAR)
+-- IS
+-- BEGIN
+-- END;
 
 -- Création de la fonctionnalité TotalPortefeuille
-CREATE FUNCTION TotalPortefeuille((Nom IN VARCHAR2)
-RETURNS NUMBER
-    [ WITH <function_option> [ ,...n ] ]
-    [ AS ]
-    BEGIN
-        function_body
-        RETURN scalar_expression
-    END
-[ ; ]
+-- CREATE FUNCTION TotalPortefeuille((Nom IN VARCHAR2)
+-- RETURNS NUMBER
+--     [ WITH <function_option> [ ,...n ] ]
+--     [ AS ]
+--     BEGIN
+--         function_body
+--         RETURN scalar_expression
+--     END
+-- [ ; ]
 
 DROP PROCEDURE Vendre;
 DROP TRIGGER solde_trig;
