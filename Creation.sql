@@ -69,12 +69,54 @@ IS
 BEGIN
 END;
 
--- Création de la procédure Vendre
-CREATE OR REPLACE PROCEDURE Vendre(NumCpte IN NUMBER, Code IN VARCHAR2, DateV IN DATE, Quant IN NUMBER,
-MV IN NUMBER) 
-IS
+CREATE SEQUENCE numop_seq;
+
+CREATE TRIGGER solde_trig BEFORE INSERT ON Operation FOR EACH ROW
+DECLARE
+    compte_pam DECIMAL(5, 2);
 BEGIN
+    IF :NEW.Nature = 'V'
+    THEN
+        SELECT PAM INTO compte_pam FROM Portefeuille WHERE NumCompte = :NEW.NumCompte AND CodeValeur = :NEW.CodeValeur;
+        UPDATE Compte SET Solde = Solde - (:NEW.Montant * :NEW.QteOp), PMVR = PMVR + (:NEW.Montant - :NEW.QteOp * compte_pam) WHERE NumCompte = :NEW.NumCompte;
+    END IF;
 END;
+/
+
+-- Création de la procédure Vendre
+CREATE PROCEDURE Vendre(NumCpte IN NUMBER, Code IN VARCHAR2, DateV IN DATE, Quant IN NUMBER, MV IN NUMBER) IS
+    quant_incorrect EXCEPTION;
+    mv_incorrect EXCEPTION;
+    non_possede EXCEPTION;
+    portefeuille_qte NUMBER;
+BEGIN
+    IF Quant <= 0
+    THEN
+        RAISE quant_incorrect;
+    END IF;
+
+    IF MV <= 0
+    THEN
+        RAISE mv_incorrect;
+    END IF;
+
+    SELECT SUM(Quantite) INTO portefeuille_qte FROM Portefeuille WHERE NumCompte = NumCpte AND CodeValeur = Code;
+
+    IF portefeuille_qte = 0
+    THEN
+        RAISE non_possede;
+    END IF;
+
+    IF portefeuille_qte = Quant
+    THEN
+        DELETE FROM Portefeuille WHERE NumCompte = NumCpte AND CodeValeur = Code;
+    ELSE
+        UPDATE Portefeuille SET Quantite = Quantite - Quant;
+    END IF;
+
+    INSERT INTO Operation VALUES(numop_seq.NEXTVAL, NumCpte, Code, DateV, 'V', Quant, MV);
+END;
+/
 
 -- Création de la procédure RepartitionPortefeuille
 CREATE OR REPLACE PROCEDURE RepartitionPortefeuille(NumCpte IN NUMBER, Critere IN CHAR) 
@@ -93,6 +135,9 @@ RETURNS NUMBER
     END
 [ ; ]
 
+DROP PROCEDURE Vendre;
+DROP TRIGGER solde_trig;
+DROP SEQUENCE numop_seq;
 DROP PROCEDURE MAJValeur;
 DROP TRIGGER valeur_pmvl;
 DROP TABLE Portefeuille;
