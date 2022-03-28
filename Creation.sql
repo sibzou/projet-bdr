@@ -126,16 +126,25 @@ END;
 -- END;
 
 -- Création de la fonctionnalité TotalPortefeuille
--- CREATE FUNCTION TotalPortefeuille((Nom IN VARCHAR2)
--- RETURNS NUMBER
---     [ WITH <function_option> [ ,...n ] ]
---     [ AS ]
---     BEGIN
---         function_body
---         RETURN scalar_expression
---     END
--- [ ; ]
+CREATE FUNCTION TotalPortefeuille(Nom IN VARCHAR2) RETURN NUMBER IS
+    client_count NUMBER;
+    total NUMBER;
+BEGIN
+    SELECT COUNT(*) INTO client_count FROM Compte WHERE NomClient = Nom;
 
+    IF client_count = 0
+    THEN
+        RETURN -1;
+    END IF;
+
+    SELECT SUM(Quantite * PAM) INTO total FROM Portefeuille, Compte
+        WHERE Portefeuille.NumCompte = Compte.NumCompte AND NomClient = Nom;
+
+    RETURN total;
+END;
+/
+
+DROP FUNCTION TotalPortefeuille;
 DROP PROCEDURE Vendre;
 DROP TRIGGER solde_trig;
 DROP SEQUENCE numop_seq;
