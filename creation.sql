@@ -60,6 +60,12 @@ BEGIN
     END IF;
 
     UPDATE Valeur SET Cours = CoursIn WHERE CodeValeur = CodeValeurIn;
+
+EXCEPTION
+    WHEN cours_incorrect THEN
+        DBMS_OUTPUT.PUT_LINE('Cours invalide');
+    WHEN code_inconnu THEN
+        DBMS_OUTPUT.PUT_LINE('Code valeur inconnu');
 END;
 /
 
