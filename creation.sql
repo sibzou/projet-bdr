@@ -109,10 +109,12 @@ BEGIN
 
     SELECT SUM(Quantite) INTO portefeuille_qte FROM Portefeuille WHERE NumCompte = NumCpte AND CodeValeur = Code;
 
-    IF portefeuille_qte < Quant
+    IF portefeuille_qte IS NULL OR portefeuille_qte < Quant
     THEN
         RAISE non_possede;
     END IF;
+
+    INSERT INTO Operation VALUES(numop_seq.NEXTVAL, NumCpte, Code, DateV, 'V', Quant, MV);
 
     IF portefeuille_qte = Quant
     THEN
@@ -121,7 +123,13 @@ BEGIN
         UPDATE Portefeuille SET Quantite = Quantite - Quant WHERE NumCompte = NumCpte AND CodeValeur = Code;
     END IF;
 
-    INSERT INTO Operation VALUES(numop_seq.NEXTVAL, NumCpte, Code, DateV, 'V', Quant, MV);
+EXCEPTION
+    WHEN quant_incorrect THEN
+        DBMS_OUTPUT.PUT_LINE('Quantité invalide');
+    WHEN mv_incorrect THEN
+        DBMS_OUTPUT.PUT_LINE('Montant invalide');
+    WHEN non_possede THEN
+        DBMS_OUTPUT.PUT_LINE('Quantité possédée insuffisante');
 END;
 /
 
