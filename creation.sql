@@ -79,7 +79,7 @@ BEGIN
     IF :NEW.Nature = 'V'
     THEN
         SELECT PAM INTO compte_pam FROM Portefeuille WHERE NumCompte = :NEW.NumCompte AND CodeValeur = :NEW.CodeValeur;
-        UPDATE Compte SET Solde = Solde - (:NEW.Montant * :NEW.QteOp), PMVR = PMVR + (:NEW.Montant - :NEW.QteOp * compte_pam) WHERE NumCompte = :NEW.NumCompte;
+        UPDATE Compte SET Solde = Solde + :NEW.Montant, PMVR = PMVR + (:NEW.Montant - :NEW.QteOp * compte_pam) WHERE NumCompte = :NEW.NumCompte;
     END IF;
 END;
 /
@@ -103,7 +103,7 @@ BEGIN
 
     SELECT SUM(Quantite) INTO portefeuille_qte FROM Portefeuille WHERE NumCompte = NumCpte AND CodeValeur = Code;
 
-    IF portefeuille_qte = 0
+    IF portefeuille_qte < Quant
     THEN
         RAISE non_possede;
     END IF;
@@ -112,7 +112,7 @@ BEGIN
     THEN
         DELETE FROM Portefeuille WHERE NumCompte = NumCpte AND CodeValeur = Code;
     ELSE
-        UPDATE Portefeuille SET Quantite = Quantite - Quant;
+        UPDATE Portefeuille SET Quantite = Quantite - Quant WHERE NumCompte = NumCpte AND CodeValeur = Code;
     END IF;
 
     INSERT INTO Operation VALUES(numop_seq.NEXTVAL, NumCpte, Code, DateV, 'V', Quant, MV);
