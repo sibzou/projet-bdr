@@ -96,6 +96,7 @@ CREATE PROCEDURE Vendre(NumCpte IN NUMBER, Code IN VARCHAR2, DateV IN DATE, Quan
     mv_incorrect EXCEPTION;
     non_possede EXCEPTION;
     portefeuille_qte NUMBER;
+    cours_valeur DECIMAL(4, 2);
 BEGIN
     IF Quant <= 0
     THEN
@@ -121,6 +122,9 @@ BEGIN
         DELETE FROM Portefeuille WHERE NumCompte = NumCpte AND CodeValeur = Code;
     ELSE
         UPDATE Portefeuille SET Quantite = Quantite - Quant WHERE NumCompte = NumCpte AND CodeValeur = Code;
+
+        SELECT Cours INTO cours_valeur FROM Valeur WHERE CodeValeur = Code;
+        UPDATE Portefeuille SET PMVL = (cours_valeur - PAM) * Quantite WHERE NumCompte = NumCpte AND CodeValeur = Code;
     END IF;
 
 EXCEPTION
