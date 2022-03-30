@@ -28,11 +28,26 @@ CREATE TABLE Portefeuille (NumCompte NUMBER(3) REFERENCES Compte(NumCompte),
                            PMVL DECIMAL(5, 2) NOT NULL,
                            PRIMARY KEY(NumCompte, CodeValeur));
 
--- Création de la procédure AjouterService
--- CREATE OR REPLACE PROCEDURE OuvrirCompte(Nom IN VARCHAR2, Montant IN NUMBER)
--- IS
--- BEGIN
--- END;
+
+CREATE SEQUENCE seqCompte START WITH 101 INCREMENT BY 1;                     
+                     
+-- Création de la procédure OuvrirCompte
+CREATE OR REPLACE PROCEDURE OuvrirCompte(Nom IN VARCHAR2, Montant IN NUMBER)
+IS
+BEGIN
+	IF Montant <= 0
+  THEN
+    RAISE_APPLICATION_ERROR (-20002, 'le montant doit être supérieur à 0');
+  END IF;
+  IF Nom is NULL
+  THEN
+    RAISE_APPLICATION_ERROR (-20002, 'le nom ne doit pas être vide');
+  END IF;
+ 
+  INSERT INTO Compte (NumCompte, NomClient, DateOuverture, Solde, PMVR)
+  VALUES (seqCompte.NEXTVAL, Nom, TRUNC(SYSDATE), Montant, 0);
+END;
+/
 
 -- Met à jour le PMVL quand le cours d'une valeur change
 CREATE TRIGGER valeur_pmvl BEFORE UPDATE OF Cours ON Valeur FOR EACH ROW
