@@ -155,8 +155,10 @@ BEGIN
         RETURN -1;
     END IF;
 
-    SELECT SUM(Quantite * PAM) INTO total FROM Portefeuille, Compte
-        WHERE Portefeuille.NumCompte = Compte.NumCompte AND NomClient = Nom;
+    SELECT SUM(Quantite * Cours) INTO total FROM Valeur, Portefeuille, Compte
+        WHERE Valeur.CodeValeur = Portefeuille.CodeValeur
+        AND Portefeuille.NumCompte = Compte.NumCompte
+        AND NomClient = Nom;
 
     RETURN total;
 END;
