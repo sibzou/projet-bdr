@@ -1,0 +1,30 @@
+MAJValeur
+
+La procédure MAJValeur peut émettre 2 exceptions lorsque :
+- la nouvelle valeur du cours donnée est inférieure à 0
+- le code valeur donné ne correspond à aucune valeur existante dans la base
+
+Pour vérifier que le code valeur donné existe, il nous fallait un moyen de savoir si une requête SELECT retourne quelque chose ou rien. Nous avons opté pour une méthode utilisant la fonction COUNT.
+
+    SELECT COUNT(*) INTO code_count FROM Valeur WHERE CodeValeur = CodeValeurIn;
+
+À la suite de cette requête, si la variable code_count est égale à 0, c'est que le code valeur n'existe pas. Sinon, c'est qu'il existe. Cette procédure déclenche un et un seul trigger qui va mettre à jour la valeur de PMVL selon la formule donnée dans l'énoncé.
+
+
+Vendre
+
+La procédure Vendre peut émettre 2 exceptions lorsque :
+- la quantité donnée est inférieure ou égale à 0
+- le montant donné est inférieur ou égal à 0
+- le vendeur ne possède pas la valeur à vendre en quantité suffisante dans son portefeuille
+
+Si la quantité de valeur à vendre est exactement égale à la quantité de valeur possédée par le vendeur, l'entrée correspondante dans la table portefeuille est effacée car il ne possédera plus du tout la valeur vendue à la suite de la vente. Si la quantité de valeur à vendre est inférieure à la quantité de valeur possédée par le vendeur, l'entrée correspondante dans la table portefeuille sera simplement mise à jour. On y déduira la quantité vendue à la quantité possédée.
+
+Dans le cas d'une vente qui n'entraîne que la mise à jour du portefeuille et pas sa suppression (quantité vendue < quantité possédée), le PMVL est recalculé selon la formule donnée dans l'énoncé.
+
+Un trigger met à jour le PMVR du compte vendeur. Puisque ce trigger met à jour la table Compte, on en profite pour aussi mettre à jour le solde du vendeur. On y ajoute le montant total de la vente.
+
+
+TotalPortefeuille
+
+Pour chaque valeur possédée par le compte donné en entrée, on multiplie la quantité possédée par le cours actuel de la valeur. La somme de tous ces produits nous donne le total du portefeuille. Si le numéro de compte donné n'existe pas, la fonction renvoie 0. On utilise à nouveau la fonction SQL COUNT pour savoir si le compte existe.
