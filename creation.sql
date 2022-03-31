@@ -1,3 +1,18 @@
+DROP FUNCTION TotalPortefeuille;
+DROP PROCEDURE Vendre;
+DROP TRIGGER solde_trig;
+DROP SEQUENCE numop_seq;
+DROP PROCEDURE MAJValeur;
+DROP PROCEDURE OuvrirCompte;
+DROP PROCEDURE RepartitionPortefeuille;
+DROP SEQUENCE seqCompte;
+DROP TRIGGER valeur_pmvl;
+DROP TABLE Portefeuille;
+DROP TABLE Operation;
+DROP TABLE Valeur;
+DROP TABLE Secteur;
+DROP TABLE Compte;
+
 CREATE TABLE Compte (NumCompte NUMBER(3) PRIMARY KEY,
                      NomClient VARCHAR2(15) NOT NULL,
                      DateOuverture DATE NOT NULL,
@@ -153,10 +168,68 @@ END;
 /
 
 -- Création de la procédure RepartitionPortefeuille
--- CREATE OR REPLACE PROCEDURE RepartitionPortefeuille(NumCpte IN NUMBER, Critere IN CHAR)
--- IS
--- BEGIN
--- END;
+CREATE OR REPLACE PROCEDURE RepartitionPortefeuille (NumCpte in number, Critere in char)
+IS
+v_numcompte Portefeuille.NumCompte%TYPE;
+v_secteur Secteur.SecteurEconomique%TYPE;
+v_codevaleur Valeur.CodeValeur%TYPE;
+v_repartition number(10,2);
+BEGIN
+  BEGIN
+  SELECT NumCompte INTO v_numcompte FROM Compte WHERE NumCompte = NumCpte;
+  EXCEPTION
+  WHEN NO_DATA_FOUND THEN
+    DBMS_OUTPUT.PUT_LINE('Erreur : Compte inexistant');
+  END;
+  IF (Critere = 'se') THEN
+    FOR rec IN (
+    SELECT SecteurEconomique, ROUND(SUM(Quantite*PAM)/(SELECT SUM(Quantite*PAM) FROM Portefeuille WHERE NumCompte = v_numcompte)*100,2) as repartition INTO v_secteur, v_repartition
+    FROM Portefeuille, Valeur, Secteur
+    WHERE Portefeuille.CodeValeur = Valeur.CodeValeur
+    AND Valeur.CodeSE = Secteur.CodeSE
+    AND Portefeuille.NumCompte = v_numcompte
+    GROUP BY SecteurEconomique
+    ORDER BY repartition DESC)
+    LOOP
+      DBMS_OUTPUT.PUT_LINE(rec.SecteurEconomique || ' : ' || rec.repartition || '%');
+    END LOOP;
+  ELSE
+    IF (Critere = 'ib') THEN
+      FOR rec IN (
+      SELECT CodeValeur, ROUND(SUM(Quantite*PAM)/(SELECT SUM(Quantite*PAM) FROM Portefeuille WHERE NumCompte = v_numcompte)*100,2) as repartition INTO v_codevaleur, v_repartition
+      FROM Portefeuille
+      WHERE Portefeuille.NumCompte = v_numcompte
+      GROUP BY CodeValeur
+      ORDER BY repartition DESC)
+      LOOP
+        DBMS_OUTPUT.PUT_LINE(rec.CodeValeur || ' : ' || rec.repartition || '%');
+      END LOOP;
+    ELSE
+      IF (Critere IS NULL) THEN
+        FOR rec IN (
+        SELECT SecteurEconomique,Portefeuille.CodeValeur, ROUND(SUM(Quantite*PAM)/(SELECT SUM(Quantite*PAM) FROM Portefeuille WHERE NumCompte = v_numcompte)*100,2) as repartition INTO v_secteur, v_codevaleur, v_repartition
+        FROM Portefeuille, Valeur, Secteur
+        WHERE Portefeuille.CodeValeur = Valeur.CodeValeur
+        AND Valeur.CodeSE = Secteur.CodeSE
+        AND Portefeuille.NumCompte = v_numcompte
+        GROUP BY SecteurEconomique,Portefeuille.CodeValeur
+        ORDER BY repartition DESC)
+        LOOP
+          DBMS_OUTPUT.PUT_LINE(rec.SecteurEconomique || ' : ' || rec.CodeValeur || ' : ' || rec.repartition || '%');
+        END LOOP;
+      ELSE
+        RAISE_APPLICATION_ERROR(-20001, 'Critère non reconnu');
+      END IF;
+    END IF;
+  END IF;
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      DBMS_OUTPUT.PUT_LINE('Erreur : Portefeuille inexistant');
+    WHEN OTHERS THEN
+      DBMS_OUTPUT.PUT_LINE('Erreur : '||sqlerrm);
+END;
+/
+
 
 -- Création de la fonctionnalité TotalPortefeuille
 CREATE FUNCTION TotalPortefeuille(Nom IN VARCHAR2) RETURN NUMBER IS
@@ -179,14 +252,33 @@ BEGIN
 END;
 /
 
-DROP FUNCTION TotalPortefeuille;
-DROP PROCEDURE Vendre;
-DROP TRIGGER solde_trig;
-DROP SEQUENCE numop_seq;
-DROP PROCEDURE MAJValeur;
-DROP TRIGGER valeur_pmvl;
-DROP TABLE Portefeuille;
-DROP TABLE Operation;
-DROP TABLE Valeur;
-DROP TABLE Secteur;
-DROP TABLE Compte;
+INSERT INTO Secteur VALUES('SE1','Energies');
+INSERT INTO Secteur VALUES('SE2','Automobile');
+INSERT INTO Secteur VALUES('SE3','Pharmacie');
+
+INSERT INTO Valeur VALUES('EDF','EDF','SE1','SBF120',10.00);
+INSERT INTO Valeur VALUES('RNO','RENAULT','SE2','CAC40',30.00);
+INSERT INTO Valeur VALUES('SAN','SANOFI','SE3','CAC40',85.00);
+
+EXECUTE OuvrirCompte('Prudent',1000);
+EXECUTE OuvrirCompte('Trader',5000);
+EXECUTE OuvrirCompte('Trader',98745);
+EXECUTE OuvrirCompte('PasLesMoyens',10);
+
+INSERT INTO Portefeuille VALUES(101,'EDF',200,9.50,100.00);
+INSERT INTO Portefeuille VALUES(101,'RNO',50,30.00,0.00);
+INSERT INTO Portefeuille VALUES(102,'EDF',100,9.00,100.00);
+INSERT INTO Portefeuille VALUES(102,'RNO',10,80.00,50.00);
+INSERT INTO Portefeuille VALUES(103,'SAN',100,5.00,10.00);
+
+
+EXECUTE RepartitionPortefeuille(101,'se');
+EXECUTE RepartitionPortefeuille(101,'ib');
+EXECUTE RepartitionPortefeuille(101,null);
+EXECUTE RepartitionPortefeuille(103,'se');
+EXECUTE RepartitionPortefeuille(100,'se');
+EXECUTE RepartitionPortefeuille(101,'id');
+
+
+
+
