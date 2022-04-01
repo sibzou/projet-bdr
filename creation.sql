@@ -172,6 +172,7 @@ IS
 v_numcompte Portefeuille.NumCompte%TYPE;
 v_secteur Secteur.SecteurEconomique%TYPE;
 v_codevaleur Valeur.CodeValeur%TYPE;
+v_indice Valeur.Indice%TYPE;
 v_repartition number(10,2);
 BEGIN
   BEGIN
@@ -195,26 +196,27 @@ BEGIN
   ELSE
     IF (Critere = 'ib') THEN
       FOR rec IN (
-      SELECT CodeValeur, ROUND(SUM(Quantite*PAM)/(SELECT SUM(Quantite*PAM) FROM Portefeuille WHERE NumCompte = v_numcompte)*100,2) as repartition INTO v_codevaleur, v_repartition
-      FROM Portefeuille
-      WHERE Portefeuille.NumCompte = v_numcompte
-      GROUP BY CodeValeur
+      SELECT Indice, ROUND(SUM(Quantite*PAM)/(SELECT SUM(Quantite*PAM) FROM Portefeuille WHERE NumCompte = v_numcompte)*100,2) as repartition INTO v_indice, v_repartition
+      FROM Portefeuille, Valeur
+      WHERE Portefeuille.CodeValeur = Valeur.CodeValeur
+      AND Portefeuille.NumCompte = v_numcompte
+      GROUP BY Indice
       ORDER BY repartition DESC)
       LOOP
-        DBMS_OUTPUT.PUT_LINE(rec.CodeValeur || ' : ' || rec.repartition || '%');
+        DBMS_OUTPUT.PUT_LINE(rec.Indice || ' : ' || rec.repartition || '%');
       END LOOP;
     ELSE
       IF (Critere IS NULL) THEN
         FOR rec IN (
-        SELECT SecteurEconomique,Portefeuille.CodeValeur, ROUND(SUM(Quantite*PAM)/(SELECT SUM(Quantite*PAM) FROM Portefeuille WHERE NumCompte = v_numcompte)*100,2) as repartition INTO v_secteur, v_codevaleur, v_repartition
+        SELECT SecteurEconomique,Indice, ROUND(SUM(Quantite*PAM)/(SELECT SUM(Quantite*PAM) FROM Portefeuille WHERE NumCompte = v_numcompte)*100,2) as repartition INTO v_secteur, v_indice, v_repartition
         FROM Portefeuille, Valeur, Secteur
         WHERE Portefeuille.CodeValeur = Valeur.CodeValeur
         AND Valeur.CodeSE = Secteur.CodeSE
         AND Portefeuille.NumCompte = v_numcompte
-        GROUP BY SecteurEconomique,Portefeuille.CodeValeur
+        GROUP BY SecteurEconomique,Indice
         ORDER BY repartition DESC)
         LOOP
-          DBMS_OUTPUT.PUT_LINE(rec.SecteurEconomique || ' : ' || rec.CodeValeur || ' : ' || rec.repartition || '%');
+          DBMS_OUTPUT.PUT_LINE(rec.SecteurEconomique || ' : ' || rec.Indice || ' : ' || rec.repartition || '%');
         END LOOP;
       ELSE
         RAISE_APPLICATION_ERROR(-20001, 'Critère non reconnu');
