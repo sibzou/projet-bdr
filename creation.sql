@@ -43,14 +43,13 @@ CREATE TABLE Portefeuille (NumCompte NUMBER(3) REFERENCES Compte(NumCompte),
                            PMVL DECIMAL(5, 2) NOT NULL,
                            PRIMARY KEY(NumCompte, CodeValeur));
 
+CREATE SEQUENCE seqCompte START WITH 101 INCREMENT BY 1;
 
-CREATE SEQUENCE seqCompte START WITH 101 INCREMENT BY 1;                     
-                     
 -- Création de la procédure OuvrirCompte
 CREATE OR REPLACE PROCEDURE OuvrirCompte(Nom IN VARCHAR2, Montant IN NUMBER)
 IS
 BEGIN
-	IF Montant <= 0
+  IF Montant <= 0
   THEN
     RAISE_APPLICATION_ERROR (-20002, 'le montant doit être supérieur à 0');
   END IF;
@@ -58,7 +57,7 @@ BEGIN
   THEN
     RAISE_APPLICATION_ERROR (-20002, 'le nom ne doit pas être vide');
   END IF;
- 
+
   INSERT INTO Compte (NumCompte, NomClient, DateOuverture, Solde, PMVR)
   VALUES (seqCompte.NEXTVAL, Nom, TRUNC(SYSDATE), Montant, 0);
 END;
@@ -230,7 +229,6 @@ BEGIN
 END;
 /
 
-
 -- Création de la fonctionnalité TotalPortefeuille
 CREATE FUNCTION TotalPortefeuille(Nom IN VARCHAR2) RETURN NUMBER IS
     client_count NUMBER;
@@ -271,14 +269,9 @@ INSERT INTO Portefeuille VALUES(102,'EDF',100,9.00,100.00);
 INSERT INTO Portefeuille VALUES(102,'RNO',10,80.00,50.00);
 INSERT INTO Portefeuille VALUES(103,'SAN',100,5.00,10.00);
 
-
 EXECUTE RepartitionPortefeuille(101,'se');
 EXECUTE RepartitionPortefeuille(101,'ib');
 EXECUTE RepartitionPortefeuille(101,null);
 EXECUTE RepartitionPortefeuille(103,'se');
 EXECUTE RepartitionPortefeuille(100,'se');
 EXECUTE RepartitionPortefeuille(101,'id');
-
-
-
-
