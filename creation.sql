@@ -3,6 +3,7 @@ DROP PROCEDURE Vendre;
 DROP TRIGGER solde_trig;
 DROP SEQUENCE numop_seq;
 DROP PROCEDURE MAJValeur;
+DROP PROCEDURE Acheter;
 DROP PROCEDURE OuvrirCompte;
 DROP PROCEDURE RepartitionPortefeuille;
 DROP SEQUENCE seqCompte;
@@ -55,6 +56,10 @@ BEGIN
   END IF;
   IF Nom is NULL
   THEN
+    RAISE_APPLICATION_ERROR (-20002, 'le nom ne doit pas être null');
+  END IF;
+  IF LTRIM(Nom) is NULL
+  THEN
     RAISE_APPLICATION_ERROR (-20002, 'le nom ne doit pas être vide');
   END IF;
 
@@ -97,6 +102,8 @@ EXCEPTION
         DBMS_OUTPUT.PUT_LINE('Code valeur inconnu');
 END;
 /
+
+CREATE SEQUENCE numop_seq;
 
 -- Création de la procédure Acheter
 CREATE OR REPLACE PROCEDURE Acheter(NumCpte IN NUMBER, Code IN VARCHAR2, DateA IN DATE, Quant IN NUMBER, MA IN NUMBER)
@@ -141,8 +148,6 @@ BEGIN
     INSERT INTO Operation VALUES(numop_seq.NEXTVAL,NumCpte,Code,DateA,'A',Quant,MA);
 END;
 /
-
-CREATE SEQUENCE numop_seq;
 
 CREATE TRIGGER solde_trig BEFORE INSERT ON Operation FOR EACH ROW
 DECLARE
@@ -291,29 +296,3 @@ BEGIN
     RETURN total;
 END;
 /
-
-INSERT INTO Secteur VALUES('SE1','Energies');
-INSERT INTO Secteur VALUES('SE2','Automobile');
-INSERT INTO Secteur VALUES('SE3','Pharmacie');
-
-INSERT INTO Valeur VALUES('EDF','EDF','SE1','SBF120',10.00);
-INSERT INTO Valeur VALUES('RNO','RENAULT','SE2','CAC40',30.00);
-INSERT INTO Valeur VALUES('SAN','SANOFI','SE3','CAC40',85.00);
-
-EXECUTE OuvrirCompte('Prudent',1000);
-EXECUTE OuvrirCompte('Trader',5000);
-EXECUTE OuvrirCompte('Trader',98745);
-EXECUTE OuvrirCompte('PasLesMoyens',10);
-
-INSERT INTO Portefeuille VALUES(101,'EDF',200,9.50,100.00);
-INSERT INTO Portefeuille VALUES(101,'RNO',50,30.00,0.00);
-INSERT INTO Portefeuille VALUES(102,'EDF',100,9.00,100.00);
-INSERT INTO Portefeuille VALUES(102,'RNO',10,80.00,50.00);
-INSERT INTO Portefeuille VALUES(103,'SAN',100,5.00,10.00);
-
-EXECUTE RepartitionPortefeuille(101,'se');
-EXECUTE RepartitionPortefeuille(101,'ib');
-EXECUTE RepartitionPortefeuille(101,null);
-EXECUTE RepartitionPortefeuille(103,'se');
-EXECUTE RepartitionPortefeuille(100,'se');
-EXECUTE RepartitionPortefeuille(101,'id');
