@@ -99,11 +99,48 @@ END;
 /
 
 -- Création de la procédure Acheter
--- CREATE OR REPLACE PROCEDURE Acheter((NumCpte IN NUMBER, Code IN VARCHAR2, DateA IN DATE, Quant IN NUMBER,
--- MA IN NUMBER)
--- IS
--- BEGIN
--- END;
+CREATE OR REPLACE PROCEDURE Acheter(NumCpte IN NUMBER, Code IN VARCHAR2, DateA IN DATE, Quant IN NUMBER, MA IN NUMBER)
+IS
+v_solde Compte.NumCompte%TYPE;
+v_codevaleur Valeur.CodeValeur%TYPE;
+valeur_cours Valeur.Cours%TYPE;
+nbPortefeuille NUMBER;
+sum_op NUMBER;
+count_op NUMBER;
+BEGIN
+    BEGIN
+    SELECT Solde INTO v_solde FROM Compte WHERE NumCompte = NumCpte;
+    EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        DBMS_OUTPUT.PUT_LINE('Erreur : Compte inexistant');
+    END;
+    BEGIN
+    SELECT CodeValeur INTO v_codevaleur FROM Valeur WHERE CodeValeur = Code;
+    EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        DBMS_OUTPUT.PUT_LINE('Erreur : Valeur inexistante');
+    END;
+    IF  Quant <= 0
+    THEN
+        RAISE_APPLICATION_ERROR (-20002, 'le quantité doit être supérieur à 0');
+    END IF;
+    IF MA <+ 0 OR MA > v_solde
+    THEN
+        RAISE_APPLICATION_ERROR (-20002, 'le montant doit être supérieur à 0 et doit être inférieur ou égal au solde du compte');
+    END IF;
+    SELECT COUNT (*) INTO nbPortefeuille FROM Portefeuille WHERE CodeValeur = Code AND NumCompte = NumCpte;
+    SELECT Cours INTO valeur_cours FROM Valeur WHERE CodeValeur = Code;
+    IF nbPortefeuille = 0
+    THEN
+        INSERT INTO Portefeuille VALUES(NumCpte,Code,Quant,valeur_cours,0);
+    ELSE
+        SELECT SUM(Montant/QteOp) INTO sum_op FROM Operation WHERE NumCompte = NumCpte AND CodeValeur = Code AND Nature='A';
+        SELECT COUNT(*) INTO count_op FROM Operation WHERE NumCompte = NumCpte AND CodeValeur = Code AND Nature='A';
+        UPDATE Portefeuille SET Quantite = Quantite + Quant, PAM = (sum_op+valeur_cours)/(count_op+1), PMVL = (valeur_cours-PAM)*Quantite;
+    END IF;
+    INSERT INTO Operation VALUES(numop_seq.NEXTVAL,NumCpte,Code,DateA,'A',Quant,MA);
+END;
+/
 
 CREATE SEQUENCE numop_seq;
 
@@ -115,6 +152,9 @@ BEGIN
     THEN
         SELECT PAM INTO compte_pam FROM Portefeuille WHERE NumCompte = :NEW.NumCompte AND CodeValeur = :NEW.CodeValeur;
         UPDATE Compte SET Solde = Solde + :NEW.Montant, PMVR = PMVR + (:NEW.Montant - :NEW.QteOp * compte_pam) WHERE NumCompte = :NEW.NumCompte;
+    ELSIF :NEW.Nature = 'A'
+    THEN
+        UPDATE Compte SET Solde = Solde - :NEW.Montant WHERE NumCompte = :NEW.NumCompte;
     END IF;
 END;
 /
