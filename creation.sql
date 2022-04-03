@@ -108,7 +108,7 @@ CREATE SEQUENCE numop_seq;
 -- Création de la procédure Acheter
 CREATE OR REPLACE PROCEDURE Acheter(NumCpte IN NUMBER, Code IN VARCHAR2, DateA IN DATE, Quant IN NUMBER, MA IN NUMBER)
 IS
-v_solde Compte.NumCompte%TYPE;
+v_solde Compte.Solde%TYPE;
 v_codevaleur Valeur.CodeValeur%TYPE;
 valeur_cours Valeur.Cours%TYPE;
 nbPortefeuille NUMBER;
@@ -131,7 +131,7 @@ BEGIN
     THEN
         RAISE_APPLICATION_ERROR (-20002, 'le quantité doit être supérieur à 0');
     END IF;
-    IF MA <+ 0 OR MA > v_solde
+    IF MA <= 0 OR MA > v_solde
     THEN
         RAISE_APPLICATION_ERROR (-20002, 'le montant doit être supérieur à 0 et doit être inférieur ou égal au solde du compte');
     END IF;
