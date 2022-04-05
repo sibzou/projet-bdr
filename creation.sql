@@ -1,18 +1,4 @@
-DROP FUNCTION TotalPortefeuille;
-DROP PROCEDURE Vendre;
-DROP TRIGGER solde_trig;
-DROP SEQUENCE numop_seq;
-DROP PROCEDURE MAJValeur;
-DROP PROCEDURE Acheter;
-DROP PROCEDURE OuvrirCompte;
-DROP PROCEDURE RepartitionPortefeuille;
-DROP SEQUENCE seqCompte;
-DROP TRIGGER valeur_pmvl;
-DROP TABLE Portefeuille;
-DROP TABLE Operation;
-DROP TABLE Valeur;
-DROP TABLE Secteur;
-DROP TABLE Compte;
+
 
 CREATE TABLE Compte (NumCompte NUMBER(3) PRIMARY KEY,
                      NomClient VARCHAR2(15) NOT NULL,
@@ -296,3 +282,19 @@ BEGIN
     RETURN total;
 END;
 /
+
+DROP FUNCTION TotalPortefeuille;
+DROP PROCEDURE Vendre;
+DROP TRIGGER solde_trig;
+DROP SEQUENCE numop_seq;
+DROP PROCEDURE MAJValeur;
+DROP PROCEDURE Acheter;
+DROP PROCEDURE OuvrirCompte;
+DROP PROCEDURE RepartitionPortefeuille;
+DROP SEQUENCE seqCompte;
+DROP TRIGGER valeur_pmvl;
+DROP TABLE Portefeuille;
+DROP TABLE Operation;
+DROP TABLE Valeur;
+DROP TABLE Secteur;
+DROP TABLE Compte;
