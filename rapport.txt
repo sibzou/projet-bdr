@@ -1,3 +1,19 @@
+OuvrirCompte
+
+La procédure OuvrirCompte peut renvoyer 3 erreurs différentes :
+-si le montant est inférieur ou égal à 0
+-si le nom est null
+-si le nom est vide 
+
+On vérifie ces erreurs directement dans les variables de la procédure "OuvrirCompte".
+
+Si les parametres sont satisfaisant on ajoute un compte dans la table Compte avec un INSERT. On utilise les variables de la procédure, la date du jour et on initialise le PMVR à 0. Le numéro de compte est renseigné à l'aide d'une séquence : 
+
+				CREATE SEQUENCE seqCompte START WITH 101 INCREMENT BY 1;
+
+Le 1er compte crée aura comme numéro de compte "101" et tout les suivants serant incrementé de 1.
+
+
 MAJValeur
 
 La procédure MAJValeur peut émettre 2 exceptions lorsque :
@@ -10,8 +26,29 @@ Pour vérifier que le code valeur donné existe, il nous fallait un moyen de sav
 
 À la suite de cette requête, si la variable code_count est égale à 0, c'est que le code valeur n'existe pas. Sinon, c'est qu'il existe. Cette procédure déclenche un et un seul trigger qui va mettre à jour la valeur de PMVL selon la formule donnée dans l'énoncé.
 
+Acheter
 
-Vendre
+La procédure Acheter peut renvoyer 4 erreurs différentes :
+-Le compte "acheteur" n'existe pas.
+-Le code valeur à acheter n'existe pas.
+-La quantité est inférieur ou égal à 0.
+-Le montant n'est pas inférieur ou égal à la solde du compte et le montant est inférieur à 0.
+
+Pour vérifier que le compte et le code valeur existe, on utilise une requête SELECT pour tester si la requête renvoie quelque chose ou non. Pour la quantité et le montant, on test directement les variables avec des conditions.
+
+Si le portefeuille du compte contient déjà des actions du code valeur entré en parametre alors la ligne est "update" dans la table "Portefeuille" avec les nouvelles valeurs et le solde de la table "Compte" est mis à jours. Dans le cas contraire on ajoute une ligne dans la table "Portefeuille" et on met à jours le solde dans la table "Compte".
+Pour tester si le client acheteur posséde déjà des actions on effectue un COUNT dans la table Portefeuille avec le code valeur et le numéro de compte.
+
+Si le client acheteur ne possède pas déjà les actions, on insère une nouvelle ligne dans la table portefeuille avec le numéro de compte, le code valeur, la quantité, la valeur du cours actuel et on initialise le PMVL à 0 car le calcul du PMVL correspond à (valeur du cours actuel-PAM)*Quantité mais à l'insant T de l'achat, si l'acheteur n'a pas déjà d'actions le PMVL sera toujours égal à 0.
+
+Si le client possède déjà des actions alors ont met à jours la ligne dans la table Portefeuille avec la nouvelle quantité, le nouveau calcul du PAM et le nouveau calcul du PMVL.
+
+Que le clients possède ou non des actions similaire lors de l'achat, on doit insérer une nouvelle ligne dans la table Opérations avec le numéro de l'opération indique par une séquence, le numéro du compte, le code valeur, la date d'achat, la nature de l'opération, la quantité et le montant.
+
+Un trigger met à jour le solde de l'acheteur après l'achat.
+
+
+Vendre 
 
 La procédure Vendre peut émettre 2 exceptions lorsque :
 - la quantité donnée est inférieure ou égale à 0
@@ -23,6 +60,9 @@ Si la quantité de valeur à vendre est exactement égale à la quantité de val
 Dans le cas d'une vente qui n'entraîne que la mise à jour du portefeuille et pas sa suppression (quantité vendue < quantité possédée), le PMVL est recalculé selon la formule donnée dans l'énoncé.
 
 Un trigger met à jour le PMVR du compte vendeur. Puisque ce trigger met à jour la table Compte, on en profite pour aussi mettre à jour le solde du vendeur. On y ajoute le montant total de la vente.
+
+
+RépartitionPortefeuille
 
 
 TotalPortefeuille
