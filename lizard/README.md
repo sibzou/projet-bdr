@@ -1,6 +1,7 @@
 # lizard
 
-La compilation du projet se fait avec Maven. Pour juste compiler :
+Ce projet utilise Java 18. La compilation se fait avec Maven.
+Pour juste compiler :
 
 ```bash
 $ mvn compile
