@@ -6,19 +6,19 @@ import javafx.scene.control.Button;
 import javafx.scene.Node;
 import javafx.geometry.Pos;
 
-import java.util.List;
 import java.util.ArrayList;
 
 public class Form extends VBox {
     private ArrayList<Integer> ids;
     private VBox fields;
+    private Button validateButton;
 
     public Form(String validateButtonText) {
         ids = new ArrayList<Integer>();
         fields = new VBox();
         fields.setSpacing(Main.MARGIN);
 
-        Button validateButton = new Button(validateButtonText);
+        validateButton = new Button(validateButtonText);
         HBox validateButtonWrapper = new HBox(validateButton);
         validateButtonWrapper.setAlignment(Pos.BASELINE_RIGHT);
 
@@ -46,5 +46,9 @@ public class Form extends VBox {
         }
 
         return null;
+    }
+
+    public void setValidateButtonText(String validateButtonText) {
+        validateButton.setText(validateButtonText);
     }
 }

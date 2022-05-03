@@ -6,9 +6,8 @@ import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.control.TextField;
-import javafx.scene.control.Label;
-import javafx.scene.control.Button;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 
@@ -37,6 +36,32 @@ public class Main extends Application {
         buySellForm.addField(FIELD_DATE, "Date");
         buySellForm.addField(FIELD_QUANTITY, "Quantité");
         buySellForm.addField(FIELD_AMOUNT, "Montant");
+
+        ToggleButton buyButton = new ToggleButton("Acheter");
+        ToggleButton sellButton = new ToggleButton("Vendre");
+        ToggleGroup buySellToggleGroup = new ToggleGroup();
+
+        buyButton.setToggleGroup(buySellToggleGroup);
+        sellButton.setToggleGroup(buySellToggleGroup);
+
+        buySellToggleGroup.selectedToggleProperty().addListener(
+                (observable, oldValue, newValue) -> {
+
+            if(newValue == null) {
+                oldValue.setSelected(true);
+            } else if(newValue == buyButton) {
+                buySellForm.setValidateButtonText("Acheter");
+            } else if(newValue == sellButton) {
+                buySellForm.setValidateButtonText("Vendre");
+            }
+        });
+
+        buyButton.setSelected(true);
+
+        HBox buySellToggleHBox = new HBox(buyButton, sellButton);
+        buySellToggleHBox.setAlignment(Pos.BASELINE_CENTER);
+        buySellToggleHBox.setSpacing(MARGIN / 2);
+        buySellForm.getChildren().add(0, buySellToggleHBox);
 
         Form distributionForm = new Form("Calculer");
         distributionForm.addField(FIELD_CRITERIA, "Critère");
