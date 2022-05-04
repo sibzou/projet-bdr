@@ -3,6 +3,7 @@ package com.lp.bdr.lizard;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
+import javafx.scene.control.ScrollPane;
 
 public class Main extends Application {
     public static final int MARGIN = 16;
@@ -14,8 +15,10 @@ public class Main extends Application {
         stage.setHeight(800);
 
         MainBox mainBox = new MainBox();
+        ScrollPane mainBoxScroll = new ScrollPane(mainBox);
+        mainBoxScroll.setFitToWidth(true);
 
-        Scene scene = new Scene(mainBox);
+        Scene scene = new Scene(mainBoxScroll);
         stage.setScene(scene);
         stage.show();
     }
