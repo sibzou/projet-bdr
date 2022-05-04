@@ -12,6 +12,7 @@ public class Form extends VBox {
     private ArrayList<Integer> ids;
     private VBox fields;
     private Button validateButton;
+    private FormValidationHandler validationHandler;
 
     public Form(String validateButtonText) {
         ids = new ArrayList<Integer>();
@@ -20,7 +21,9 @@ public class Form extends VBox {
 
         validateButton = new Button(validateButtonText);
         HBox validateButtonWrapper = new HBox(validateButton);
+
         validateButtonWrapper.setAlignment(Pos.BASELINE_RIGHT);
+        validateButton.setOnAction(event -> validationHandler.onValidate());
 
         getChildren().addAll(fields, validateButtonWrapper);
         setSpacing(Main.MARGIN);
@@ -57,5 +60,9 @@ public class Form extends VBox {
 
     public void setValidateButtonText(String validateButtonText) {
         validateButton.setText(validateButtonText);
+    }
+
+    public void setOnValidate(FormValidationHandler validationHandler) {
+        this.validationHandler = validationHandler;
     }
 }
