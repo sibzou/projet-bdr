@@ -7,9 +7,13 @@ import javafx.scene.layout.VBox;
 public class LabeledTextField extends VBox {
     private final TextField textField;
 
+    protected TextField createTextField() {
+        return new TextField();
+    }
+
     public LabeledTextField(String labelText) {
         Label label = new Label(labelText);
-        textField = new TextField();
+        textField = createTextField();
 
         getChildren().addAll(label, textField);
     }

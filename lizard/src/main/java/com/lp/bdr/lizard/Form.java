@@ -26,10 +26,17 @@ public class Form extends VBox {
         setSpacing(Main.MARGIN);
     }
 
-    public void addField(int id, String fieldLabelText) {
+    private void addFieldObj(int id, LabeledTextField field) {
         ids.add(id);
-        LabeledTextField field = new LabeledTextField(fieldLabelText);
         fields.getChildren().add(field);
+    }
+
+    public void addField(int id, String fieldLabelText) {
+        addFieldObj(id, new LabeledTextField(fieldLabelText));
+    }
+
+    public void addPasswordField(int id, String fieldLabelText) {
+        addFieldObj(id, new LabeledPasswordField(fieldLabelText));
     }
 
     private String getFieldValueByIndex(int fieldIndex) {

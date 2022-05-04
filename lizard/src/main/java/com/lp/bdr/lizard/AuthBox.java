@@ -7,7 +7,7 @@ public class AuthBox extends Form {
     public AuthBox() {
         super("Se connecter");
         addField(FIELD_USER, "Nom d'utilisateur");
-        addField(FIELD_PASSWORD, "Mot de passe");
+        addPasswordField(FIELD_PASSWORD, "Mot de passe");
 
         setMaxWidth(400);
     }
