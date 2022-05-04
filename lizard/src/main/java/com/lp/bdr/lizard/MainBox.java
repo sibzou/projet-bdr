@@ -1,12 +1,14 @@
 package com.lp.bdr.lizard;
 
+import com.lp.bdr.lizard.db.Database;
+
 import javafx.scene.layout.VBox;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 
 public class MainBox extends VBox {
-    public MainBox() {
-        AuthBox authBox = new AuthBox();
+    public MainBox(Database database) {
+        AuthBox authBox = new AuthBox(database);
 
         LabeledTextField accountTextField
             = new LabeledTextField("Numéro de compte");

@@ -1,5 +1,7 @@
 package com.lp.bdr.lizard;
 
+import com.lp.bdr.lizard.db.Database;
+
 import javafx.application.Application;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
@@ -14,7 +16,9 @@ public class Main extends Application {
         stage.setWidth(800);
         stage.setHeight(800);
 
-        MainBox mainBox = new MainBox();
+        Database database = new Database();
+
+        MainBox mainBox = new MainBox(database);
         ScrollPane mainBoxScroll = new ScrollPane(mainBox);
         mainBoxScroll.setFitToWidth(true);
 
