@@ -1,11 +1,18 @@
 package com.lp.bdr.lizard;
 
+import javafx.scene.Node;
+import javafx.scene.control.Label;
+import javafx.scene.paint.Color;
+
+import java.util.List;
+
 public class AuthBox extends Form {
     private static int FIELD_USER = 0,
                        FIELD_PASSWORD = 1,
                        FIELD_HOST = 2;
 
     private ConnectionProvider connectionProvider;
+    private Label errorLabel;
 
     public AuthBox(ConnectionProvider connectionProvider) {
         super("Se connecter");
@@ -15,12 +22,22 @@ public class AuthBox extends Form {
         addField(FIELD_USER, "Nom d'utilisateur");
         addPasswordField(FIELD_PASSWORD, "Mot de passe");
 
+        errorLabel = new Label("La connexion a échoué.");
+        errorLabel.setTextFill(Color.RED);
+
         setOnValidate(this::onValidate);
         setMaxWidth(400);
     }
 
     private void onValidate() {
-        connectionProvider.connect(getFieldValue(FIELD_HOST),
+        List<Node> childs = getChildren();
+        childs.remove(errorLabel);
+
+        boolean res = connectionProvider.connect(getFieldValue(FIELD_HOST),
             getFieldValue(FIELD_USER), getFieldValue(FIELD_PASSWORD));
+
+        if(!res) {
+            childs.add(childs.size() - 1, errorLabel);
+        }
     }
 }
