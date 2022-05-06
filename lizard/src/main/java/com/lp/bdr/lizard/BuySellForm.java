@@ -6,15 +6,22 @@ public class BuySellForm extends Form implements BuySellSwitchHandler {
                              FIELD_QUANTITY = 2,
                              FIELD_AMOUNT = 3;
 
-    public BuySellForm() {
+    private BuySellToggle toggle;
+    private BuySellHandler handler;
+
+    public BuySellForm(BuySellHandler handler) {
         super("Acheter ou vendre");
+        this.handler = handler;
+
         addField(FIELD_VALUE_CODE, "Code valeur");
         addField(FIELD_DATE, "Date");
         addField(FIELD_QUANTITY, "Quantité");
         addField(FIELD_AMOUNT, "Montant");
 
-        BuySellToggle toggle = new BuySellToggle(this);
+        toggle = new BuySellToggle(this);
         getChildren().add(0, toggle);
+
+        setOnValidate(this::onValidate);
     }
 
     @Override
@@ -25,5 +32,13 @@ public class BuySellForm extends Form implements BuySellSwitchHandler {
     @Override
     public void onSellMode() {
         setValidateButtonText("Vendre");
+    }
+
+    private void onValidate() {
+        if(toggle.isSellMode()) {
+            handler.sell(null);
+        } else {
+            handler.buy(null);
+        }
     }
 }

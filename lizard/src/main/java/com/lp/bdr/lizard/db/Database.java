@@ -1,12 +1,14 @@
 package com.lp.bdr.lizard.db;
 
 import com.lp.bdr.lizard.ConnectionProvider;
+import com.lp.bdr.lizard.BuySellQuery;
+import com.lp.bdr.lizard.BuySellHandlerWithError;
 
 import java.sql.DriverManager;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public class Database implements ConnectionProvider {
+public class Database implements ConnectionProvider, BuySellHandlerWithError {
     private Connection connection;
 
     @Override
@@ -20,5 +22,15 @@ public class Database implements ConnectionProvider {
         }
 
         return true;
+    }
+
+    @Override
+    public String buy(BuySellQuery query) {
+        return "Pas de base de données pour l'achat.";
+    }
+
+    @Override
+    public String sell(BuySellQuery query) {
+        return "Pas de base de données pour la vente.";
     }
 }

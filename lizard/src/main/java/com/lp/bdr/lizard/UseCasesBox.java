@@ -6,8 +6,8 @@ import javafx.scene.layout.Priority;
 public class UseCasesBox extends HBox {
     private static final int FIELD_CRITERIA = 0;
 
-    public UseCasesBox() {
-        BuySellForm buySellForm = new BuySellForm();
+    public UseCasesBox(BuySellHandler buySellHandler) {
+        BuySellForm buySellForm = new BuySellForm(buySellHandler);
 
         Form distributionForm = new Form("Calculer");
         distributionForm.addField(FIELD_CRITERIA, "Critère");

@@ -8,6 +8,7 @@ import javafx.geometry.Pos;
 import javafx.beans.value.ObservableValue;
 
 public class BuySellToggle extends HBox {
+    private ToggleGroup toggleGroup;
     private ToggleButton buyButton;
     private ToggleButton sellButton;
     private BuySellSwitchHandler swtHandler;
@@ -17,12 +18,11 @@ public class BuySellToggle extends HBox {
         sellButton = new ToggleButton("Vendre");
         this.swtHandler = swtHandler;
 
-        ToggleGroup buySellToggleGroup = new ToggleGroup();
+        toggleGroup = new ToggleGroup();
+        buyButton.setToggleGroup(toggleGroup);
+        sellButton.setToggleGroup(toggleGroup);
 
-        buyButton.setToggleGroup(buySellToggleGroup);
-        sellButton.setToggleGroup(buySellToggleGroup);
-
-        buySellToggleGroup.selectedToggleProperty().addListener(
+        toggleGroup.selectedToggleProperty().addListener(
             this::onSelectedToggleChange);
 
         buyButton.setSelected(true);
@@ -43,5 +43,9 @@ public class BuySellToggle extends HBox {
         } else if(newValue == sellButton) {
             swtHandler.onSellMode();
         }
+    }
+
+    public boolean isSellMode() {
+        return toggleGroup.getSelectedToggle() == sellButton;
     }
 }
