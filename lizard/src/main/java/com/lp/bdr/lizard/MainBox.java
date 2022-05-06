@@ -9,6 +9,7 @@ import javafx.geometry.Pos;
 public class MainBox extends VBox implements BuySellHandler {
     private LabeledTextField accountTextField;
     private BuySellHandlerWithError buySellHandler;
+    private ResultBox resultBox;
 
     public MainBox(Database database) {
         AuthBox authBox = new AuthBox(database);
@@ -17,7 +18,7 @@ public class MainBox extends VBox implements BuySellHandler {
         accountTextField.setMaxWidth(400);
 
         UseCasesBox useCasesBox = new UseCasesBox(this);
-        ResultBox resultBox = new ResultBox();
+        resultBox = new ResultBox();
         getChildren().addAll(authBox, accountTextField, useCasesBox, resultBox);
 
         setPadding(new Insets(Main.MARGIN));
@@ -35,8 +36,14 @@ public class MainBox extends VBox implements BuySellHandler {
         accountTextField.hideError();
         query.accountNumber = accountTextField.safeParseInt(errorReporter);
 
-        if(!errorReporter.error)
-            buySellHandler.buy(query);
+        if(errorReporter.error) return;
+        String errorMessage = buySellHandler.buy(query);
+        resultBox.reset();
+
+        if(errorMessage == null)
+            resultBox.showSuccess();
+        else
+            resultBox.showError(errorMessage);
     }
 
     @Override
@@ -44,7 +51,13 @@ public class MainBox extends VBox implements BuySellHandler {
         accountTextField.hideError();
         query.accountNumber = accountTextField.safeParseInt(errorReporter);
 
-        if(!errorReporter.error)
-            buySellHandler.sell(query);
+        if(errorReporter.error) return;
+        String errorMessage = buySellHandler.sell(query);
+        resultBox.reset();
+
+        if(errorMessage == null)
+            resultBox.showSuccess();
+        else
+            resultBox.showError(errorMessage);
     }
 }

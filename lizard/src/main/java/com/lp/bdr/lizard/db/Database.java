@@ -38,7 +38,7 @@ public class Database implements ConnectionProvider, BuySellHandlerWithError {
             cstmt.setFloat(5, query.amount);
             cstmt.execute();
         } catch (SQLException exception) {
-            return "Une erreur d'achat s'est produite.";
+            return exception.getMessage();
         }
 
         return null;
@@ -55,7 +55,7 @@ public class Database implements ConnectionProvider, BuySellHandlerWithError {
             cstmt.setFloat(5, query.amount);
             cstmt.execute();
         } catch (SQLException exception) {
-            return "Une erreur de vente s'est produite.";
+            return exception.getMessage();
         }
 
         return null;
