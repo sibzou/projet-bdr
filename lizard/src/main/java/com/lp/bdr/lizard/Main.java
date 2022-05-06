@@ -14,7 +14,7 @@ public class Main extends Application {
     public void start(Stage stage) {
         stage.setTitle("lizard");
         stage.setWidth(800);
-        stage.setHeight(800);
+        stage.setHeight(1000);
 
         Database database = new Database();
 
