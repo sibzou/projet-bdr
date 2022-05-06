@@ -12,8 +12,10 @@ public class Database implements ConnectionProvider, BuySellHandlerWithError {
     private Connection connection;
 
     @Override
-    public boolean connect(String host, String user, String password) {
-        String url = "jdbc:oracle:thin:@" + host;
+    public boolean connect(String host, String database, String user,
+            String password) {
+
+        String url = "jdbc:oracle:thin:@" + host + "/" + database;
 
         try {
             connection = DriverManager.getConnection(url, user, password);

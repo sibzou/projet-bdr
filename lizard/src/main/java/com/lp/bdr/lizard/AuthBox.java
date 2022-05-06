@@ -9,7 +9,8 @@ import java.util.List;
 public class AuthBox extends Form {
     private static int FIELD_USER = 0,
                        FIELD_PASSWORD = 1,
-                       FIELD_HOST = 2;
+                       FIELD_HOST = 2,
+                       FIELD_DATABASE = 3;
 
     private ConnectionProvider connectionProvider;
     private Label errorLabel;
@@ -19,6 +20,7 @@ public class AuthBox extends Form {
         this.connectionProvider = connectionProvider;
 
         addField(FIELD_HOST, "Adresse du serveur");
+        addField(FIELD_DATABASE, "Nom de la base de données");
         addField(FIELD_USER, "Nom d'utilisateur");
         addPasswordField(FIELD_PASSWORD, "Mot de passe");
 
@@ -34,7 +36,8 @@ public class AuthBox extends Form {
         childs.remove(errorLabel);
 
         boolean res = connectionProvider.connect(getFieldValue(FIELD_HOST),
-            getFieldValue(FIELD_USER), getFieldValue(FIELD_PASSWORD));
+            getFieldValue(FIELD_DATABASE), getFieldValue(FIELD_USER),
+            getFieldValue(FIELD_PASSWORD));
 
         if(!res) {
             childs.add(childs.size() - 1, errorLabel);
