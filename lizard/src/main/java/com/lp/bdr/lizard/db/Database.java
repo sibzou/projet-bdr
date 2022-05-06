@@ -47,7 +47,7 @@ public class Database implements ConnectionProvider, BuySellHandlerWithError {
     @Override
     public String sell(BuySellQuery query) {
         try {
-            CallableStatement cstmt = connection.prepareCall("{call Vente(?, ?, ?, ?, ?)}");
+            CallableStatement cstmt = connection.prepareCall("{call Vendre(?, ?, ?, ?, ?)}");
             cstmt.setInt(1, query.accountNumber);
             cstmt.setString(2, query.valueCode);
             cstmt.setString(3, query.date);
