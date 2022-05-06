@@ -6,9 +6,11 @@ import javafx.scene.layout.VBox;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 
-public class MainBox extends VBox implements BuySellHandler {
+public class MainBox extends VBox implements BuySellMiddleHandler,
+        WalletDistributionMiddleProvider {
+
     private LabeledTextField accountTextField;
-    private BuySellHandlerWithError buySellHandler;
+    private QueryHandler queryHandler;
     private ResultBox resultBox;
 
     public MainBox(Database database) {
@@ -28,7 +30,7 @@ public class MainBox extends VBox implements BuySellHandler {
         setMargin(accountTextField, new Insets(0, 0, 2 * Main.MARGIN, 0));
         setMargin(useCasesBox, new Insets(0, 0, 4 * Main.MARGIN, 0));
 
-        buySellHandler = database;
+        queryHandler = database;
     }
 
     @Override
@@ -37,7 +39,7 @@ public class MainBox extends VBox implements BuySellHandler {
         query.accountNumber = accountTextField.safeParseInt(errorReporter);
 
         if(errorReporter.error) return;
-        String errorMessage = buySellHandler.buy(query);
+        String errorMessage = queryHandler.buy(query);
         resultBox.reset();
 
         if(errorMessage == null)
@@ -52,7 +54,23 @@ public class MainBox extends VBox implements BuySellHandler {
         query.accountNumber = accountTextField.safeParseInt(errorReporter);
 
         if(errorReporter.error) return;
-        String errorMessage = buySellHandler.sell(query);
+        String errorMessage = queryHandler.sell(query);
+        resultBox.reset();
+
+        if(errorMessage == null)
+            resultBox.showSuccess();
+        else
+            resultBox.showError(errorMessage);
+    }
+
+    @Override
+    public void getWalletDistribution(WalletDistributionQuery query) {
+        accountTextField.hideError();
+        ErrorReporter errorReporter = new ErrorReporter();
+        query.accountNumber = accountTextField.safeParseInt(errorReporter);
+
+        if(errorReporter.error) return;
+        String errorMessage = queryHandler.getWalletDistribution(query);
         resultBox.reset();
 
         if(errorMessage == null)

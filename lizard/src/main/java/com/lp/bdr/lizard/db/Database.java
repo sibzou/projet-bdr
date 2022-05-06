@@ -2,14 +2,15 @@ package com.lp.bdr.lizard.db;
 
 import com.lp.bdr.lizard.ConnectionProvider;
 import com.lp.bdr.lizard.BuySellQuery;
-import com.lp.bdr.lizard.BuySellHandlerWithError;
+import com.lp.bdr.lizard.WalletDistributionQuery;
+import com.lp.bdr.lizard.QueryHandler;
 
 import java.sql.CallableStatement;
 import java.sql.DriverManager;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public class Database implements ConnectionProvider, BuySellHandlerWithError {
+public class Database implements ConnectionProvider, QueryHandler {
     private Connection connection;
 
     @Override
@@ -59,5 +60,10 @@ public class Database implements ConnectionProvider, BuySellHandlerWithError {
         }
 
         return null;
+    }
+
+    @Override
+    public String getWalletDistribution(WalletDistributionQuery query) {
+        return "Not implemented";
     }
 }

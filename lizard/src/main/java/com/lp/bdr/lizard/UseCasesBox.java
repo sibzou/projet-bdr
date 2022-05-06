@@ -6,17 +6,31 @@ import javafx.scene.layout.Priority;
 public class UseCasesBox extends HBox {
     private static final int FIELD_CRITERIA = 0;
 
-    public UseCasesBox(BuySellHandler buySellHandler) {
-        BuySellForm buySellForm = new BuySellForm(buySellHandler);
+    private Form walletDistributionForm;
+    private WalletDistributionMiddleProvider walletDistributionMiddleProvider;
 
-        Form distributionForm = new Form("Calculer");
-        distributionForm.addField(FIELD_CRITERIA, "Critère");
+    public UseCasesBox(MainBox mainBox) {
+        BuySellForm buySellForm = new BuySellForm(mainBox);
+        walletDistributionMiddleProvider = mainBox;
 
-        getChildren().addAll(buySellForm, distributionForm);
+        walletDistributionForm = new Form("Calculer");
+        walletDistributionForm.addField(FIELD_CRITERIA, "Critère");
+
+        walletDistributionForm
+            .setOnValidate(this::onWalletDistributionFormValidate);
+
+        getChildren().addAll(buySellForm, walletDistributionForm);
 
         setMaxWidth(800);
         setSpacing(Main.MARGIN);
         setHgrow(buySellForm, Priority.ALWAYS);
-        setHgrow(distributionForm, Priority.ALWAYS);
+        setHgrow(walletDistributionForm, Priority.ALWAYS);
+    }
+
+    private void onWalletDistributionFormValidate() {
+        WalletDistributionQuery query = new WalletDistributionQuery();
+        query.criteria = walletDistributionForm.getFieldValue(FIELD_CRITERIA);
+
+        walletDistributionMiddleProvider.getWalletDistribution(query);
     }
 }

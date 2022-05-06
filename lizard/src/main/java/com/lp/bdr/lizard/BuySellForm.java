@@ -7,9 +7,9 @@ public class BuySellForm extends Form implements BuySellSwitchHandler {
                              FIELD_AMOUNT = 3;
 
     private BuySellToggle toggle;
-    private BuySellHandler handler;
+    private BuySellMiddleHandler handler;
 
-    public BuySellForm(BuySellHandler handler) {
+    public BuySellForm(BuySellMiddleHandler handler) {
         super("Acheter ou vendre");
         this.handler = handler;
 
