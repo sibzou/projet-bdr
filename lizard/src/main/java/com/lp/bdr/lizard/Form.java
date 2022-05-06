@@ -6,6 +6,7 @@ import javafx.scene.control.Button;
 import javafx.scene.Node;
 import javafx.geometry.Pos;
 
+import java.util.List;
 import java.util.ArrayList;
 
 public class Form extends VBox {
@@ -42,20 +43,18 @@ public class Form extends VBox {
         addFieldObj(id, new LabeledPasswordField(fieldLabelText));
     }
 
-    private String getFieldValueByIndex(int fieldIndex) {
-        Node fieldNode = fields.getChildren().get(fieldIndex);
-        LabeledTextField field = (LabeledTextField)fieldNode;
-        return field.getValue();
-    }
-
-    public String getFieldValue(int fieldId) {
+    private LabeledTextField getField(int fieldId) {
         for(int i = 0; i < ids.size(); i++) {
             if(ids.get(i) == fieldId) {
-                return getFieldValueByIndex(i);
+                return (LabeledTextField)fields.getChildren().get(i);
             }
         }
 
         return null;
+    }
+
+    public String getFieldValue(int fieldId) {
+        return getField(fieldId).getValue();
     }
 
     public void setValidateButtonText(String validateButtonText) {
@@ -64,5 +63,26 @@ public class Form extends VBox {
 
     public void setOnValidate(FormValidationHandler validationHandler) {
         this.validationHandler = validationHandler;
+    }
+
+    public void showError(int fieldId, String errorMessage) {
+        getField(fieldId).showError(errorMessage);
+    }
+
+    public void hideErrors() {
+        List<Node> childs = fields.getChildren();
+
+        for(Node node : childs) {
+            LabeledTextField field = (LabeledTextField)node;
+            field.hideError();
+        }
+    }
+
+    public int safeParseQueryInt(int fieldId, ErrorReporter errorReporter) {
+        return getField(fieldId).safeParseInt(errorReporter);
+    }
+
+    public float safeParseQueryFloat(int fieldId, ErrorReporter errorReporter) {
+        return getField(fieldId).safeParseFloat(errorReporter);
     }
 }

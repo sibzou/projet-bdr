@@ -7,13 +7,13 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 
 public class MainBox extends VBox implements BuySellHandler {
+    private LabeledTextField accountTextField;
     private BuySellHandlerWithError buySellHandler;
 
     public MainBox(Database database) {
         AuthBox authBox = new AuthBox(database);
 
-        LabeledTextField accountTextField
-            = new LabeledTextField("Numéro de compte");
+        accountTextField = new LabeledTextField("Numéro de compte");
         accountTextField.setMaxWidth(400);
 
         UseCasesBox useCasesBox = new UseCasesBox(this);
@@ -31,14 +31,20 @@ public class MainBox extends VBox implements BuySellHandler {
     }
 
     @Override
-    public void buy(BuySellQuery query) {
-        // append the account number to the query
-        buySellHandler.buy(query);
+    public void buy(BuySellQuery query, ErrorReporter errorReporter) {
+        accountTextField.hideError();
+        query.accountNumber = accountTextField.safeParseInt(errorReporter);
+
+        if(!errorReporter.error)
+            buySellHandler.buy(query);
     }
 
     @Override
-    public void sell(BuySellQuery query) {
-        // append the account number to the query
-        buySellHandler.sell(query);
+    public void sell(BuySellQuery query, ErrorReporter errorReporter) {
+        accountTextField.hideError();
+        query.accountNumber = accountTextField.safeParseInt(errorReporter);
+
+        if(!errorReporter.error)
+            buySellHandler.sell(query);
     }
 }

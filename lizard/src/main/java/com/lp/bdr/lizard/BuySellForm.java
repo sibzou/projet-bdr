@@ -34,11 +34,26 @@ public class BuySellForm extends Form implements BuySellSwitchHandler {
         setValidateButtonText("Vendre");
     }
 
+    private BuySellQuery makeQuery(ErrorReporter errorReporter) {
+        BuySellQuery query = new BuySellQuery();
+        hideErrors();
+
+        query.valueCode = getFieldValue(FIELD_VALUE_CODE);
+        query.date = getFieldValue(FIELD_DATE);
+        query.quantity = safeParseQueryInt(FIELD_QUANTITY, errorReporter);
+        query.amount = safeParseQueryFloat(FIELD_AMOUNT, errorReporter);
+
+        return query;
+    }
+
     private void onValidate() {
+        ErrorReporter errorReporter = new ErrorReporter();
+        BuySellQuery query = makeQuery(errorReporter);
+
         if(toggle.isSellMode()) {
-            handler.sell(null);
+            handler.sell(query, errorReporter);
         } else {
-            handler.buy(null);
+            handler.buy(query, errorReporter);
         }
     }
 }
