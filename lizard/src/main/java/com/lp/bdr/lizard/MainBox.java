@@ -33,49 +33,37 @@ public class MainBox extends VBox implements BuySellMiddleHandler,
         queryHandler = database;
     }
 
-    @Override
-    public void buy(BuySellQuery query, ErrorReporter errorReporter) {
+    private <Q extends Query> void doQuery(Q query, ErrorReporter errorReporter,
+            QueryPerformer<Q> performer) {
+
         accountTextField.hideError();
         query.accountNumber = accountTextField.safeParseInt(errorReporter);
 
         if(errorReporter.error) return;
-        String errorMessage = queryHandler.buy(query);
+        QueryResult result = performer.perform(query);
         resultBox.reset();
 
-        if(errorMessage == null)
+        if(result.errorMessage == null)
             resultBox.showSuccess();
         else
-            resultBox.showError(errorMessage);
+            resultBox.showError(result.errorMessage);
+
+        resultBox.showOutput(result.output);
+    }
+
+    @Override
+    public void buy(BuySellQuery query, ErrorReporter errorReporter) {
+        doQuery(query, errorReporter, queryHandler::buy);
     }
 
     @Override
     public void sell(BuySellQuery query, ErrorReporter errorReporter) {
-        accountTextField.hideError();
-        query.accountNumber = accountTextField.safeParseInt(errorReporter);
-
-        if(errorReporter.error) return;
-        String errorMessage = queryHandler.sell(query);
-        resultBox.reset();
-
-        if(errorMessage == null)
-            resultBox.showSuccess();
-        else
-            resultBox.showError(errorMessage);
+        doQuery(query, errorReporter, queryHandler::sell);
     }
 
     @Override
     public void getWalletDistribution(WalletDistributionQuery query) {
-        accountTextField.hideError();
         ErrorReporter errorReporter = new ErrorReporter();
-        query.accountNumber = accountTextField.safeParseInt(errorReporter);
-
-        if(errorReporter.error) return;
-        String errorMessage = queryHandler.getWalletDistribution(query);
-        resultBox.reset();
-
-        if(errorMessage == null)
-            resultBox.showSuccess();
-        else
-            resultBox.showError(errorMessage);
+        doQuery(query, errorReporter, queryHandler::getWalletDistribution);
     }
 }

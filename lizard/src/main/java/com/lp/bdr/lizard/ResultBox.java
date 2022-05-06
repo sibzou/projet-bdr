@@ -51,8 +51,18 @@ public class ResultBox extends VBox {
         getChildren().setAll(errorLabel);
     }
 
-    public void showOutput(String output) {
-        outputLabel.setText(output);
+    /* it's like oracle jdbc output arrays always end with a "null" entry, we
+       ignore it */
+    public void showOutput(String[] output) {
+        if(output.length <= 1) return;
+
+        String outputConc = output[0];
+
+        for(int i = 1; i < output.length - 1; i++) {
+            outputConc += "\n" + output[i];
+        }
+
+        outputLabel.setText(outputConc);
         getChildren().addAll(outputTitleLabel, outputLabel);
     }
 }

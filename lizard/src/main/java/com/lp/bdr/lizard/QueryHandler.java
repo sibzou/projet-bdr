@@ -1,7 +1,7 @@
 package com.lp.bdr.lizard;
 
 public interface QueryHandler {
-    String buy(BuySellQuery query);
-    String sell(BuySellQuery query);
-    String getWalletDistribution(WalletDistributionQuery query);
+    QueryResult buy(BuySellQuery query);
+    QueryResult sell(BuySellQuery query);
+    QueryResult getWalletDistribution(WalletDistributionQuery query);
 }

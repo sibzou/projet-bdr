@@ -1,6 +1,5 @@
 package com.lp.bdr.lizard;
 
-public class WalletDistributionQuery {
-    public int accountNumber;
+public class WalletDistributionQuery extends Query {
     public String criteria;
 }
