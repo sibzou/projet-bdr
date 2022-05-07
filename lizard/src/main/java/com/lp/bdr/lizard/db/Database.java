@@ -94,9 +94,18 @@ public class Database implements ConnectionProvider, QueryHandler {
 
     @Override
     public QueryResult getWalletDistribution(WalletDistributionQuery query) {
-        QueryResult result = new QueryResult();
-        result.errorMessage = "Not implemented";
-        result.output = new String[] {null};
+        QueryResult result = beginQuery();
+
+        try {
+            CallableStatement cstmt = connection.prepareCall("{call RepartitionPortefeuille(?, ?)}");
+            cstmt.setInt(1, query.accountNumber);
+            cstmt.setString(2, query.criteria);
+            cstmt.execute();
+        } catch (SQLException exception) {
+            result.errorMessage = exception.getMessage();
+        }
+        appendDbmsOutput(result);
         return result;
     }
+
 }
